@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Motoristas CENA</title>
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1a2e4a;--navy-dark:#0f1e32;--blue:#185FA5;--blue-lt:#EBF4FF;
+  --green:#1a6e3a;--green-lt:#e8f5ee;--red:#8B1A1A;--red-lt:#fdf0f0;
+  --amber:#7a4a00;--amber-lt:#fff8e1;--purple:#4a1a6e;--purple-lt:#f3eeff;
+  --g50:#f8f9fa;--g100:#f0f1f3;--g200:#e2e4e8;--g400:#9aa0ab;--g600:#5a6070;--g800:#1e2330;
+  --border:#e2e4e8;--r:8px;--rlg:12px;
+}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--g50);color:var(--g800);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.page{display:none}.page.active{display:block}
+header{background:var(--navy);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:9px;cursor:pointer}
+.logo-icon{width:30px;height:30px;background:rgba(255,255,255,.15);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.logo-title{color:#fff;font-size:14px;font-weight:600}.logo-sub{color:rgba(255,255,255,.45);font-size:11px}
+nav{display:flex;gap:6px}
+.main{max-width:700px;margin:0 auto;padding:28px 16px 60px}
+.main-wide{max-width:980px;margin:0 auto;padding:28px 16px 60px}
+footer{text-align:center;padding:18px;font-size:11px;color:var(--g400);border-top:1px solid var(--border);background:#fff}
+h1{font-size:22px;color:var(--navy);margin-bottom:8px}
+h2{font-size:18px;color:var(--navy);margin-bottom:6px}
+input,select,textarea{font-family:inherit;font-size:14px;width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r);background:#fff;color:var(--g800);outline:none;transition:border .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(24,95,165,.1)}
+input::placeholder{color:var(--g400)}
+label{display:block;font-size:11px;font-weight:600;color:var(--g600);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border-radius:var(--r);font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--g800);transition:all .15s}
+.btn:hover{background:var(--g50)}.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:var(--navy);border-color:var(--navy);color:#fff}.btn-primary:hover{background:var(--navy-dark)}
+.btn-success{background:var(--green);border-color:var(--green);color:#fff}
+.btn-danger{background:var(--red);border-color:var(--red);color:#fff}
+.btn-wpp{background:#25D366;border-color:#25D366;color:#fff}.btn-wpp:hover{background:#1da851}
+.btn-sm{padding:6px 13px;font-size:13px}
+.btn-nav{background:transparent;color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.2)}
+.btn-nav:hover{background:rgba(255,255,255,.1);color:#fff}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--rlg);padding:20px 22px}
+.field{margin-bottom:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500}
+.badge-p{background:var(--amber-lt);color:var(--amber)}
+.badge-a{background:var(--green-lt);color:var(--green)}
+.badge-r{background:var(--red-lt);color:var(--red)}
+.divider{border:none;border-top:1px solid var(--border);margin:18px 0}
+.spin{width:16px;height:16px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.stat-label{font-size:11px;color:var(--g400);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.stat-val{font-size:26px;font-weight:700;margin-top:3px}
+.step-bar{display:flex;align-items:center;margin-bottom:24px}
+.step-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.step-line{flex:1;height:1.5px;background:var(--border);margin:0 4px;margin-bottom:14px}
+.step-line.done{background:var(--green)}
+.step-label{font-size:10px;font-weight:500;white-space:nowrap;text-align:center;margin-top:3px}
+.step-item{display:flex;flex-direction:column;align-items:center}
+.upload-area{border:1.5px dashed var(--border);border-radius:10px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .15s;background:var(--g50)}
+.upload-area:hover{border-color:var(--blue);background:var(--blue-lt)}
+.upload-done{border-color:var(--green);background:var(--green-lt)}
+.upload-thumb{width:100%;max-height:110px;object-fit:cover;border-radius:6px;margin-top:6px;border:1px solid var(--border)}
+table.data{width:100%;border-collapse:collapse;font-size:13px}
+table.data th{padding:9px 13px;text-align:left;font-size:11px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.04em;background:var(--g50);border-bottom:1px solid var(--border);white-space:nowrap}
+table.data td{padding:10px 13px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tab-bar{display:flex;background:#fff;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:14px}
+.tab{flex:1;padding:8px 12px;font-size:13px;font-weight:500;border:none;cursor:pointer;background:transparent;color:var(--g600);font-family:inherit;transition:all .15s}
+.tab.active{background:var(--navy);color:#fff}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-bg.open{display:flex}
+.modal-box{background:#fff;border-radius:14px;padding:22px;width:100%;max-width:760px;max-height:90vh;overflow-y:auto;position:relative}
+.modal-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--g400)}
+.sheet-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+.img-preview-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--blue);cursor:pointer;padding:4px 8px;background:var(--blue-lt);border-radius:6px;border:none;font-family:inherit}
+input[type=file]{display:none}
+
+/* ── DASHBOARD CHARTS ── */
+.chart-bar-wrap{display:flex;flex-direction:column;gap:6px}
+.chart-bar-row{display:flex;align-items:center;gap:10px;font-size:12px}
+.chart-bar-label{width:80px;color:var(--g600);text-align:right;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chart-bar-bg{flex:1;background:var(--g100);border-radius:4px;height:18px;overflow:hidden}
+.chart-bar-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.chart-bar-val{width:30px;color:var(--g400);font-weight:600;flex-shrink:0}
+.donut-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+.donut-label{position:absolute;text-align:center}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo" onclick="showPage('home')">
+    <div class="logo-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg></div>
+    <div><div class="logo-title">Motoristas CENA</div><div class="logo-sub">LAND SOLUÇÕES LTDA.</div></div>
+  </div>
+  <nav>
+    <button class="btn btn-sm btn-nav" onclick="showPage('motorista-login')">🚗 Área do motorista</button>
+    <button class="btn btn-sm btn-nav" onclick="showPage('consulta')">Protocolo</button>
+    <button class="btn btn-sm btn-nav" id="btnAdminNav" onclick="goAdmin()">Admin</button>
+  </nav>
+</header>
+
+<!-- ═══ HOME ═══ -->
+<div id="page-home" class="page active">
+  <div class="main" style="max-width:500px;text-align:center;padding-top:36px">
+    <div style="width:72px;height:72px;background:var(--navy);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="white"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+    </div>
+    <h1>Cadastro de Motoristas</h1>
+    <p style="color:var(--g600);font-size:15px;line-height:1.7;margin-bottom:28px">Plataforma digital da <strong>CENA</strong>. O processo leva cerca de 3 minutos.</p>
+    <button class="btn btn-primary" style="width:100%;padding:13px;font-size:15px;margin-bottom:10px" onclick="showPage('cadastro');initCadastro()">🚗 Iniciar cadastro</button>
+    <button class="btn" style="width:100%;color:var(--g600);margin-bottom:8px" onclick="showPage('motorista-login')">🔐 Já tenho cadastro — entrar</button>
+    <button class="btn" style="width:100%;color:var(--g400)" onclick="showPage('consulta')">Consultar protocolo</button>
+    <div style="margin-top:32px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:13px 8px;text-align:center"><div style="font-size:20px">🪪</div><div style="font-size:11px;font-weight:600;color:var(--navy);margin-top:5px">CNH digital</div></div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:13px 8px;text-align:center"><div style="font-size:20px">📄</div><div style="font-size:11px;font-weight:600;color:var(--navy);margin-top:5px">Termo FOR-10-001</div></div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:13px 8px;text-align:center"><div style="font-size:20px">✍️</div><div style="font-size:11px;font-weight:600;color:var(--navy);margin-top:5px">Assinatura digital</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CADASTRO ═══ -->
+<div id="page-cadastro" class="page">
+  <div class="main">
+    <h2 style="margin-bottom:4px">Solicitação de cadastro</h2>
+    <p style="font-size:13px;color:var(--g400);margin-bottom:22px">Preencha todos os campos obrigatórios.</p>
+    <div class="step-bar" id="stepBar"></div>
+    <div class="card" id="stepContent"></div>
+    <div style="display:flex;justify-content:space-between;margin-top:14px" id="stepNav">
+      <button class="btn" id="btnBack" onclick="prevStep()">← Voltar</button>
+      <button class="btn btn-primary" id="btnNext">Próximo →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PROTOCOLO ═══ -->
+<div id="page-protocolo" class="page">
+  <div class="main" style="max-width:480px;text-align:center">
+    <div style="width:68px;height:68px;background:var(--green-lt);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:32px auto 18px">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="#1a6e3a"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+    </div>
+    <h1 style="margin-bottom:8px">Solicitação enviada!</h1>
+    <div class="card" style="text-align:left;margin-bottom:14px">
+      <p style="font-size:11px;font-weight:600;color:var(--g400);text-transform:uppercase;margin-bottom:6px">Número do protocolo</p>
+      <p id="protocoloNum" style="font-size:28px;font-weight:700;color:var(--blue);font-family:'DM Mono',monospace;letter-spacing:.04em;margin-bottom:10px"></p>
+      <p style="font-size:13px;color:var(--g600);line-height:1.7;margin-bottom:12px">Guarde este número. Você receberá retorno em breve.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-wpp" id="btnWpp" onclick="enviarWhatsApp()">💬 Compartilhar no WhatsApp</button>
+        <button class="btn btn-sm" id="btnPdfProtocolo" onclick="gerarPDFProtocolo()">📄 Baixar comprovante PDF</button>
+      </div>
+    </div>
+    <button class="btn" style="width:100%;margin-bottom:10px" onclick="showPage('motorista-login')">🔐 Entrar na área do motorista</button>
+    <button class="btn" style="width:100%;color:var(--g400)" onclick="showPage('home')">Voltar ao início</button>
+  </div>
+</div>
+
+<!-- ═══ ÁREA DO MOTORISTA ═══ -->
+<div id="page-motorista-login" class="page">
+  <div style="min-height:calc(100vh - 54px);background:linear-gradient(135deg,var(--navy) 0%,#0f1e32 100%);display:flex;align-items:center;justify-content:center;padding:16px">
+    <div style="width:100%;max-width:360px">
+      <div style="text-align:center;margin-bottom:22px">
+        <div style="font-size:40px;margin-bottom:10px">🚗</div>
+        <div style="color:#fff;font-size:20px;font-weight:700">Área do motorista</div>
+        <div style="color:rgba(255,255,255,.45);font-size:13px;margin-top:4px">Acompanhe seu cadastro</div>
+      </div>
+      <div style="background:#fff;border-radius:16px;padding:24px">
+        <div class="field"><label>CPF</label><input id="motCPF" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
+        <div class="field"><label>Número do protocolo</label><input id="motProt" placeholder="SOL-000000" oninput="this.value=this.value.toUpperCase()"></div>
+        <div id="motErr" style="font-size:13px;color:var(--red);margin-bottom:10px;display:none"></div>
+        <button class="btn btn-primary" style="width:100%" onclick="loginMotorista()">Acessar</button>
+      </div>
+      <p style="text-align:center;margin-top:14px;font-size:13px"><span style="color:rgba(255,255,255,.45);cursor:pointer" onclick="showPage('home')">← Voltar</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAINEL DO MOTORISTA ═══ -->
+<div id="page-motorista-painel" class="page">
+  <div class="main" style="max-width:520px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h2 style="margin-bottom:0">Meu cadastro</h2>
+      <button class="btn btn-sm" onclick="showPage('home')">Sair</button>
+    </div>
+    <div id="motPainelContent"></div>
+  </div>
+</div>
+
+<!-- ═══ CONSULTA ═══ -->
+<div id="page-consulta" class="page">
+  <div class="main" style="max-width:460px">
+    <h2 style="margin-bottom:4px">Consultar protocolo</h2>
+    <div class="card">
+      <div class="field"><label>Número do protocolo</label><input id="consultInput" placeholder="SOL-000000" style="font-family:'DM Mono',monospace;font-size:16px;letter-spacing:.05em" oninput="this.value=this.value.toUpperCase()"></div>
+      <button class="btn btn-primary" style="width:100%" onclick="consultarProtocolo()">Consultar</button>
+      <div id="consultResult" style="margin-top:14px"></div>
+    </div>
+    <p style="text-align:center;margin-top:14px;font-size:13px"><span style="color:var(--blue);cursor:pointer" onclick="showPage('home')">← Voltar</span></p>
+  </div>
+</div>
+
+<!-- ═══ ADMIN LOGIN ═══ -->
+<div id="page-adminLogin" class="page">
+  <div style="min-height:calc(100vh - 54px);background:var(--navy);display:flex;align-items:center;justify-content:center;padding:16px">
+    <div style="width:100%;max-width:360px">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="width:46px;height:46px;background:rgba(255,255,255,.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2C9.24 2 7 4.24 7 7c0 2.76 2.24 5 5 5s5-2.24 5-5-2.24-5-5-5zm0 12c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4z"/></svg></div>
+        <div style="color:#fff;font-size:18px;font-weight:600">Área administrativa</div>
+      </div>
+      <div style="background:#fff;border-radius:14px;padding:26px 22px">
+        <div class="field"><label>E-mail</label><input id="adminEmail" type="email"></div>
+        <div class="field"><label>Senha</label><input id="adminSenha" type="password" onkeydown="if(event.key==='Enter')fazerLogin()"></div>
+        <div id="loginErr" style="font-size:13px;color:var(--red);margin-bottom:10px;display:none"></div>
+        <button class="btn btn-primary" style="width:100%" onclick="fazerLogin()">Entrar</button>
+      </div>
+      <p style="text-align:center;margin-top:14px"><span style="color:rgba(255,255,255,.45);cursor:pointer;font-size:13px" onclick="showPage('home')">← Voltar</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADMIN DASHBOARD ═══ -->
+<div id="page-admin" class="page">
+  <div class="main-wide">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+      <div><h2 style="margin-bottom:2px">Painel de solicitações</h2><p style="font-size:13px;color:var(--g400)" id="adminGreet"></p></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-sm" onclick="showPage('adminDashboard')">📊 Dashboard</button>
+        <button class="btn btn-sm" onclick="showPage('adminPlanilha')">📋 Planilha</button>
+        <button class="btn btn-sm" onclick="showPage('adminConfig')">⚙️ Config</button>
+        <button class="btn btn-sm" onclick="fazerLogout()">Sair</button>
+      </div>
+    </div>
+    <div class="g4" id="statsGrid" style="margin-bottom:22px"></div>
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <div class="tab-bar" style="margin-bottom:0;flex-shrink:0">
+        <button class="tab active" id="tab-pendente" onclick="setTab('pendente')">Pendentes</button>
+        <button class="tab" id="tab-aprovado" onclick="setTab('aprovado')">Aprovados</button>
+        <button class="tab" id="tab-rejeitado" onclick="setTab('rejeitado')">Rejeitados</button>
+        <button class="tab" id="tab-todos" onclick="setTab('todos')">Todos</button>
+      </div>
+      <input id="adminBusca" placeholder="Buscar nome, CPF, CNH, protocolo..." style="flex:1;min-width:180px;font-size:13px" oninput="renderAdmin()">
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden">
+      <div style="overflow-x:auto"><table class="data" id="adminTable"></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DASHBOARD ANALÍTICO ═══ -->
+<div id="page-adminDashboard" class="page">
+  <div class="main-wide">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+      <span style="color:var(--g400);cursor:pointer;font-size:13px" onclick="showPage('admin')">← Voltar</span>
+      <h2 style="margin-bottom:0">Dashboard analítico</h2>
+    </div>
+    <div id="dashContent"></div>
+  </div>
+</div>
+
+<!-- ═══ PLANILHA ═══ -->
+<div id="page-adminPlanilha" class="page">
+  <div class="main-wide">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="color:var(--g400);cursor:pointer;font-size:13px" onclick="showPage('admin')">← Voltar</span>
+        <h2 style="margin-bottom:0">Planilha</h2>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm btn-primary" onclick="exportarCSV()">⬇ CSV</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <div class="tab-bar" style="margin-bottom:0;flex-shrink:0">
+        <button class="tab active" id="ptab-todos" onclick="setPTab('todos')">Todos</button>
+        <button class="tab" id="ptab-pendente" onclick="setPTab('pendente')">Pendentes</button>
+        <button class="tab" id="ptab-aprovado" onclick="setPTab('aprovado')">Aprovados</button>
+        <button class="tab" id="ptab-rejeitado" onclick="setPTab('rejeitado')">Rejeitados</button>
+      </div>
+      <input id="planilhaBusca" placeholder="Buscar..." style="flex:1;min-width:160px;font-size:13px" oninput="renderPlanilha()">
+    </div>
+    <div class="sheet-wrap"><table class="data" id="planilhaTable"></table></div>
+  </div>
+</div>
+
+<!-- ═══ DETALHE ═══ -->
+<div id="page-adminDetalhe" class="page">
+  <div class="main-wide" id="detalheContent"></div>
+</div>
+
+<!-- ═══ CONFIG ═══ -->
+<div id="page-adminConfig" class="page">
+  <div class="main" style="max-width:520px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px">
+      <span style="color:var(--g400);cursor:pointer;font-size:13px" onclick="showPage('admin')">← Voltar</span>
+      <h2 style="margin-bottom:0">Configurações</h2>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <p style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:14px">Conta admin</p>
+      <div class="g2">
+        <div class="field"><label>E-mail</label><input id="cfgEmail"></div>
+        <div class="field"><label>Nova senha</label><input id="cfgSenha" type="password" placeholder="Nova senha"></div>
+      </div>
+      <div class="field"><label>Senha atual</label><input id="cfgSenhaAtual" type="password"></div>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <p style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px">WhatsApp de notificação</p>
+      <p style="font-size:12px;color:var(--g400);margin-bottom:10px">Número que receberá avisos quando houver novo cadastro.</p>
+      <div class="field"><label>WhatsApp (com DDD)</label><input id="cfgWpp" placeholder="5511999999999"></div>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <p style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px">EmailJS</p>
+      <div class="field"><label>Service ID</label><input id="cfgEjsService" placeholder="service_xxxxxxx"></div>
+      <div class="field"><label>Template ID</label><input id="cfgEjsTemplate" placeholder="template_xxxxxxx"></div>
+      <div class="field"><label>Public Key</label><input id="cfgEjsKey" placeholder="xxxxxxxxxxxxxxx"></div>
+      <div class="field"><label>E-mail destino</label><input id="cfgEmailDest" placeholder="email@cenabr.com.br"></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="salvarConfig()">Salvar</button>
+    <div id="cfgMsg" style="font-size:13px;text-align:center;margin-top:10px"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg" onclick="closeModal(event)">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" onclick="closeModalForce()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<footer>CENA — LAND SOLUÇÕES LTDA. · CNPJ 28.390.966/0001-00 · Rua Coaquira, 110 – Vila Anastácio – São Paulo – SP</footer>
+
+<script>
+// ══ SUPABASE CONFIG ══
+const SUPA_URL = 'https://sqdvagoupaafucusexqs.supabase.co';
+const SUPA_KEY = 'sb_publishable_Zofwq-iY-V-9VUkRleau-A_iBMK4zBM';
+const SUPA_HEADERS = { 'Content-Type': 'application/json', 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY };
+
+const SUPA = {
+  async select(table, filter='') {
+    try {
+      const r = await fetch(`${SUPA_URL}/rest/v1/${table}?${filter}&order=criado_em.desc`, { headers: SUPA_HEADERS });
+      if (!r.ok) throw new Error(await r.text());
+      return await r.json();
+    } catch(e) { console.error('SUPA.select', e); return []; }
+  },
+  async insert(table, data) {
+    try {
+      const r = await fetch(`${SUPA_URL}/rest/v1/${table}`, { method:'POST', headers:{...SUPA_HEADERS,'Prefer':'return=representation'}, body: JSON.stringify(data) });
+      if (!r.ok) throw new Error(await r.text());
+      return await r.json();
+    } catch(e) { console.error('SUPA.insert', e); return null; }
+  },
+  async update(table, id, data) {
+    try {
+      const r = await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, { method:'PATCH', headers:{...SUPA_HEADERS,'Prefer':'return=representation'}, body: JSON.stringify(data) });
+      if (!r.ok) throw new Error(await r.text());
+      return await r.json();
+    } catch(e) { console.error('SUPA.update', e); return null; }
+  },
+  async uploadFoto(path, base64data) {
+    try {
+      // Converte base64 para blob
+      const res = await fetch(base64data);
+      const blob = await res.blob();
+      const r = await fetch(`${SUPA_URL}/storage/v1/object/CNH-FOTOS/${path}`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPA_KEY,
+          'Authorization': 'Bearer ' + SUPA_KEY,
+          'Content-Type': 'image/jpeg',
+          'x-upsert': 'true'
+        },
+        body: blob
+      });
+      if (!r.ok) throw new Error(await r.text());
+      return `${SUPA_URL}/storage/v1/object/public/CNH-FOTOS/${path}`;
+    } catch(e) { console.error('SUPA.uploadFoto', e); return null; }
+  }
+};
+
+// ══ CONFIG LOCAL (credenciais admin ficam no localStorage) ══
+const DB = {
+  get: k => JSON.parse(localStorage.getItem(k)||'null'),
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v)),
+};
+function getCfg(k, def='') { return DB.get('cfg_'+k) ?? def; }
+function setCfg(k, v) { DB.set('cfg_'+k, v); }
+
+// Init credenciais padrão
+if (!DB.get('cfg_adminEmail')) setCfg('adminEmail', 'fabio.guadagnini@cenabr.com.br');
+if (!DB.get('cfg_adminSenha')) setCfg('adminSenha', 'admin123');
+if (!DB.get('cfg_emailDest'))  setCfg('emailDest', 'juliana.mokarzel@cenabr.com.br');
+if (!DB.get('cfg_wpp'))        setCfg('wpp', '');
+
+// ══ NAV ══
+let isLoggedIn=false;
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('btnAdminNav').textContent=isLoggedIn?'Painel':'Admin';
+  window.scrollTo(0,0);
+  if(p==='admin') renderAdmin();
+  if(p==='adminConfig') loadConfig();
+  if(p==='adminPlanilha') renderPlanilha();
+  if(p==='adminDashboard') renderDashboard();
+}
+function goAdmin(){isLoggedIn?showPage('admin'):showPage('adminLogin');}
+
+// ══ MODAL ══
+function openModal(html){document.getElementById('modalContent').innerHTML=html;document.getElementById('modalBg').classList.add('open');}
+function closeModal(e){if(e.target===document.getElementById('modalBg'))closeModalForce();}
+function closeModalForce(){document.getElementById('modalBg').classList.remove('open');document.getElementById('modalContent').innerHTML='';}
+function previewImagem(id,lado){
+  const sol=DB.getArr('motoristas_solic').find(s=>s.id===id);
+  if(!sol)return;
+  const data=lado==='frente'?sol.cnhFrenteData:sol.cnhVersoData;
+  if(!data){alert('Imagem não disponível.');return;}
+  openModal(`<p style="font-weight:600;font-size:14px;color:var(--navy);margin-bottom:12px">CNH — ${lado==='frente'?'Frente':'Verso'} · ${sol.nome}</p><img src="${data}" style="width:100%;border-radius:8px;border:1px solid var(--border)">`);
+}
+function previewTermoPorId(id){
+  const sol=DB.getArr('motoristas_solic').find(s=>s.id===id);
+  if(!sol){alert('Não encontrado.');return;}
+  openModal(`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><p style="font-weight:600;font-size:14px">FOR-10-001 — ${sol.nome}</p><button class="btn btn-sm btn-primary" onclick="gerarPDFById(${id})">📄 Baixar PDF</button></div>${gerarTermoHTML(sol,true)}`);
+}
+
+// ══ CADASTRO ══
+let step=1,formData={},cnhFrenteFile=null,cnhVersoFile=null,cnhFrenteData=null,cnhVersoData=null,sigData=null;
+let _protocolo='',_id=0;
+
+function initCadastro(){step=1;formData={};cnhFrenteFile=null;cnhVersoFile=null;cnhFrenteData=null;cnhVersoData=null;sigData=null;renderStep();}
+function renderStepBar(){
+  const labels=['Dados','CNH','Assinatura','Revisar'];
+  let h='';
+  labels.forEach((l,i)=>{
+    const n=i+1,done=n<step,act=n===step;
+    const ds=done?'background:var(--green-lt);color:var(--green);border:1.5px solid var(--green)':act?'background:var(--navy);color:#fff;border:none':'background:var(--g100);color:var(--g400);border:1px solid var(--border)';
+    h+=`<div class="step-item"><div class="step-dot" style="${ds}">${done?'✓':n}</div><div class="step-label" style="color:${act?'var(--navy)':done?'var(--green)':'var(--g400)'}">${l}</div></div>`;
+    if(i<labels.length-1)h+=`<div class="step-line ${done?'done':''}"></div>`;
+  });
+  document.getElementById('stepBar').innerHTML=h;
+}
+function renderStep(){
+  renderStepBar();
+  const c=document.getElementById('stepContent');
+  document.getElementById('btnBack').style.display=step>1?'':'none';
+  if(step===1)renderStep1(c);
+  else if(step===2)renderStep2(c);
+  else if(step===3)renderStep3(c);
+  else if(step===4)renderStep4(c);
+}
+function renderStep1(c){
+  c.innerHTML=`<p style="font-weight:600;font-size:15px;color:var(--navy);margin-bottom:16px">Dados pessoais</p>
+    <div class="g2"><div class="field"><label>Matrícula *</label><input id="f_mat" value="${formData.matricula||''}" placeholder="00123"></div><div class="field"><label>Nome completo *</label><input id="f_nom" value="${formData.nome||''}" placeholder="Nome do motorista"></div></div>
+    <div class="g2"><div class="field"><label>CPF *</label><input id="f_cpf" value="${formData.cpf||''}" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div><div class="field"><label>Telefone *</label><input id="f_tel" value="${formData.telefone||''}" placeholder="(11) 99999-9999"></div></div>
+    <div class="g2"><div class="field"><label>Cargo *</label><input id="f_car" value="${formData.cargo||''}" placeholder="Ex: Motorista"></div><div class="field"><label>Centro de custo *</label><input id="f_cc" value="${formData.centrocusto||''}" placeholder="CC-0042"></div></div>
+    <div class="field"><label>Gestor responsável *</label><input id="f_ges" value="${formData.gestor||''}" placeholder="Nome do gestor"></div>`;
+  document.getElementById('btnNext').onclick=valStep1;
+}
+function maskCPF(el){let v=el.value.replace(/\D/g,'').slice(0,11);if(v.length>9)v=v.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/,'$1.$2.$3-$4');else if(v.length>6)v=v.replace(/(\d{3})(\d{3})(\d{0,3})/,'$1.$2.$3');else if(v.length>3)v=v.replace(/(\d{3})(\d{0,3})/,'$1.$2');el.value=v;}
+function valStep1(){
+  const map=[['f_mat','matricula'],['f_nom','nome'],['f_cpf','cpf'],['f_tel','telefone'],['f_car','cargo'],['f_cc','centrocusto'],['f_ges','gestor']];
+  for(const[id,k] of map){const el=document.getElementById(id);if(!el.value.trim()){el.focus();alert('Preencha: '+el.previousElementSibling.textContent.replace(' *',''));return;}formData[k]=el.value.trim();}
+  if(formData.cpf.replace(/\D/g,'').length!==11){alert('CPF inválido.');return;}
+  step=2;renderStep();
+}
+function renderStep2(c){
+  c.innerHTML=`<p style="font-weight:600;font-size:15px;color:var(--navy);margin-bottom:16px">Dados da CNH</p>
+    <div class="g3"><div class="field"><label>Número *</label><input id="f_cnh" value="${formData.cnh||''}" placeholder="00000000000"></div><div class="field"><label>Validade *</label><input id="f_val" type="date" value="${formData.cnhval||''}"></div><div class="field"><label>Categoria *</label><select id="f_cat"><option value="">Selecione</option>${['A','B','AB','C','D','E','AC','AD','AE'].map(v=>`<option${formData.categoria===v?' selected':''}>${v}</option>`).join('')}</select></div></div>
+    <div class="field"><label>Status *</label><select id="f_sts"><option value="">Selecione</option>${['Válida','Vencida','Suspensa','Cassada','Em renovação'].map(v=>`<option${formData.cnhstatus===v?' selected':''}>${v}</option>`).join('')}</select></div>
+    <hr class="divider"><p style="font-weight:600;font-size:14px;color:var(--navy);margin-bottom:10px">Fotos da CNH</p>
+    <div class="g2">
+      <div><div class="upload-area ${cnhFrenteData?'upload-done':''}" onclick="document.getElementById('inputFrente').click()">${cnhFrenteData?`<img src="${cnhFrenteData}" class="upload-thumb"><p style="font-size:12px;color:var(--green);font-weight:500;margin-top:6px">✓ Frente</p>`:'<div style="font-size:22px">🪪</div><p style="font-size:13px;font-weight:500;margin-top:6px;color:var(--g600)">CNH — frente</p><p style="font-size:11px;color:var(--g400)">Toque para selecionar</p>'}</div><input type="file" id="inputFrente" accept="image/*,.pdf" onchange="onUpload(this,'f')"></div>
+      <div><div class="upload-area ${cnhVersoData?'upload-done':''}" onclick="document.getElementById('inputVerso').click()">${cnhVersoData?`<img src="${cnhVersoData}" class="upload-thumb"><p style="font-size:12px;color:var(--green);font-weight:500;margin-top:6px">✓ Verso</p>`:'<div style="font-size:22px">🪪</div><p style="font-size:13px;font-weight:500;margin-top:6px;color:var(--g600)">CNH — verso</p><p style="font-size:11px;color:var(--g400)">Toque para selecionar</p>'}</div><input type="file" id="inputVerso" accept="image/*,.pdf" onchange="onUpload(this,'v')"></div>
+    </div>`;
+  document.getElementById('btnNext').onclick=valStep2;
+}
+function onUpload(input, lado){
+  const f = input.files[0]; if(!f) return;
+  const maxW = 600, quality = 0.4;
+  const img = new Image();
+  const r = new FileReader();
+  r.onload = e => {
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if(w > maxW){ h = Math.round(h * maxW / w); w = maxW; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/jpeg', quality);
+      const kb = Math.round(compressed.length * 0.75 / 1024);
+      if(lado==='f'){ cnhFrenteFile=f; cnhFrenteData=compressed; }
+      else { cnhVersoFile=f; cnhVersoData=compressed; }
+      console.log(`CNH ${lado} comprimida: ~${kb}KB`);
+      renderStep2(document.getElementById('stepContent'));
+    };
+    img.src = e.target.result;
+  };
+  r.readAsDataURL(f);
+}
+function valStep2(){
+  const fs=[['f_cnh','cnh'],['f_val','cnhval'],['f_cat','categoria'],['f_sts','cnhstatus']];
+  for(const[id,k] of fs){const el=document.getElementById(id);if(!el.value.trim()){alert('Preencha: '+el.previousElementSibling.textContent.replace(' *',''));return;}formData[k]=el.value.trim();}
+  step=3;renderStep();
+}
+function renderStep3(c){
+  c.innerHTML=`<p style="font-weight:600;font-size:15px;color:var(--navy);margin-bottom:4px">Termo FOR-10-001 — Leia e assine</p>
+    <p style="font-size:13px;color:var(--g600);margin-bottom:12px">Leia o documento completo e assine no campo abaixo.</p>
+    <div style="background:var(--g50);border:1px solid var(--border);border-radius:8px;padding:14px;max-height:200px;overflow-y:auto;margin-bottom:14px;font-size:12px;color:var(--g600);line-height:1.8">${gerarTermoTexto()}</div>
+    <p style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Assine abaixo</p>
+    <div style="position:relative;border:2px dashed var(--border);border-radius:8px;background:#fff;cursor:crosshair;touch-action:none">
+      <canvas id="sigCanvas" style="display:block;width:100%;height:140px;touch-action:none"></canvas>
+      <div id="sigHint" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--g400);font-size:13px;pointer-events:none">✍️ Assine aqui</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:8px"><button class="btn btn-sm" onclick="clearSig()">Limpar</button><span id="sigStatus" style="font-size:12px;color:var(--green);font-weight:500"></span></div>`;
+  initSigCanvas();
+  document.getElementById('btnNext').onclick=valStep3;
+}
+function gerarTermoTexto(){
+  const d=formData,hoje=new Date().toLocaleDateString('pt-BR');
+  return `<strong>FOR-10-001 — TERMO DE RESPONSABILIDADE POR USO DE VEÍCULO</strong><br><br>Pelo presente termo, eu, <strong>${d.nome||'___'}</strong>, CPF <strong>${d.cpf||'___'}</strong>, na qualidade de <strong>${d.cargo||'___'}</strong> da LAND SOLUÇÕES LTDA. (CENA), Rua Coaquira, 110 – Vila Anastácio – São Paulo – SP, CNPJ 28.390.966/0001-00, responsabilizo-me civil e criminalmente por qualquer ação ou omissão ao conduzir veículo da CENA, obrigando-me a: 1) Respeitar todas as normas de trânsito; 2) Dirigir com cautela; 3) Ser diligente com o veículo; 4) Pagar multas em até 24h da notificação; 5) Pagar avarias/sinistros imediatamente; 6) Retirar e devolver o veículo diariamente; 7) Guardar em local seguro; 8) Informar danos imediatamente; 9) Verificar condição ao receber; 10) Jamais ceder as chaves a não autorizados; 11) Não usar o veículo para fins pessoais; 12) Não transportar sem autorização; 13) Não realizar modificações sem autorização escrita; 14) Não suprimir peças sem autorização; 15) Cumprir a IT-10-001 UTILIZAÇÃO DE FROTA. O descumprimento sujeita-me à rescisão por justa causa (art. 482 CLT). São Paulo, ${hoje}.`;
+}
+function gerarTermoHTML(sol,comAssinatura=false){
+  const hoje=new Date(sol.criadoEm||Date.now()).toLocaleDateString('pt-BR');
+  return `<div style="font-size:13px;line-height:1.85;color:#222">
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--g400);border:1px solid var(--border);padding:8px 12px;border-radius:6px;margin-bottom:14px;background:var(--g50)"><span><strong>FOR-10-001 — TERMO DE RESPONSABILIDADE POR USO DE VEÍCULO</strong></span><span>Rev.0 · 13/06/2024</span></div>
+    <p style="margin-bottom:10px">Pelo presente termo, eu, <strong>${sol.nome}</strong>, CPF <strong>${sol.cpf}</strong>, na qualidade de <strong>${sol.cargo}</strong> da LAND SOLUÇÕES LTDA. (CENA), Rua Coaquira, N° 110, Vila Anastácio, São Paulo – SP, CNPJ 28.390.966/0001-00, responsabilizo-me civil e criminalmente por qualquer ação ou omissão ao conduzir veículo da CENA, comprometendo-me a cumprir integralmente os itens 1 a 15 do presente termo, incluindo respeitar normas de trânsito, pagar multas e avarias, não ceder as chaves, não usar o veículo pessoalmente e não realizar modificações sem autorização. O descumprimento sujeita-me à rescisão por justa causa (art. 482 CLT).</p>
+    <p style="margin-bottom:18px">São Paulo, ${hoje}</p>
+    <div style="border-top:1.5px solid #333;width:240px;padding-top:8px">
+      ${comAssinatura&&sol.sigData?`<img src="${sol.sigData}" style="height:55px;display:block;margin-bottom:4px">`:'<div style="height:55px"></div>'}
+      <p style="font-size:12px"><strong>${sol.nome}</strong></p>
+      <p style="font-size:11px;color:var(--g400)">Mat: ${sol.matricula} · Protocolo: ${sol.protocolo||'—'}</p>
+    </div>
+    <p style="font-size:11px;color:var(--g400);margin-top:16px;border-top:1px solid var(--border);padding-top:8px">CENA – LAND SOLUÇÕES LTDA. · CNPJ 28.390.966/0001-00</p>
+  </div>`;
+}
+function initSigCanvas(){
+  const cv=document.getElementById('sigCanvas');if(!cv)return;
+  cv.width=cv.offsetWidth*devicePixelRatio;cv.height=140*devicePixelRatio;
+  const ctx=cv.getContext('2d');ctx.scale(devicePixelRatio,devicePixelRatio);
+  ctx.strokeStyle='#1a2e4a';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.lineJoin='round';
+  if(sigData){const img=new Image();img.onload=()=>ctx.drawImage(img,0,0,cv.offsetWidth,140);img.src=sigData;}
+  let drawing=false;
+  function pos(e){const r=cv.getBoundingClientRect();const s=e.touches?e.touches[0]:e;return{x:s.clientX-r.left,y:s.clientY-r.top};}
+  cv.addEventListener('mousedown',e=>{drawing=true;ctx.beginPath();const p=pos(e);ctx.moveTo(p.x,p.y)});
+  cv.addEventListener('mousemove',e=>{if(!drawing)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();markSig()});
+  cv.addEventListener('mouseup',()=>drawing=false);cv.addEventListener('mouseleave',()=>drawing=false);
+  cv.addEventListener('touchstart',e=>{e.preventDefault();drawing=true;ctx.beginPath();const p=pos(e);ctx.moveTo(p.x,p.y)},{passive:false});
+  cv.addEventListener('touchmove',e=>{e.preventDefault();if(!drawing)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();markSig()},{passive:false});
+  cv.addEventListener('touchend',()=>drawing=false);
+}
+function markSig(){
+  document.getElementById('sigHint').style.display='none';
+  document.getElementById('sigStatus').textContent='✓ Assinatura registrada';
+  // Comprime a assinatura
+  const cv = document.getElementById('sigCanvas');
+  const tmp = document.createElement('canvas');
+  tmp.width = cv.offsetWidth; tmp.height = 140;
+  tmp.getContext('2d').drawImage(cv, 0, 0, cv.width, cv.height, 0, 0, tmp.width, tmp.height);
+  sigData = tmp.toDataURL('image/jpeg', 0.7);
+}
+function clearSig(){const cv=document.getElementById('sigCanvas');cv.getContext('2d').clearRect(0,0,cv.width,cv.height);sigData=null;document.getElementById('sigHint').style.display='';document.getElementById('sigStatus').textContent='';}
+function valStep3(){if(!sigData){alert('Assine o documento antes de continuar.');return;}step=4;renderStep();}
+function renderStep4(c){
+  const rows=[['Matrícula',formData.matricula],['Nome',formData.nome],['CPF',formData.cpf],['Telefone',formData.telefone],['Cargo',formData.cargo],['C. Custo',formData.centrocusto],['Gestor',formData.gestor],['CNH',formData.cnh],['Validade',formData.cnhval],['Categoria',formData.categoria],['Status CNH',formData.cnhstatus],['CNH frente',cnhFrenteFile?cnhFrenteFile.name:'—'],['CNH verso',cnhVersoFile?cnhVersoFile.name:'—'],['Assinatura',sigData?'✓ Assinado':'—']];
+  c.innerHTML=`<p style="font-weight:600;font-size:15px;color:var(--navy);margin-bottom:14px">Revisar e enviar</p>
+    <div style="background:var(--g50);border-radius:8px;padding:12px 14px;margin-bottom:14px"><table style="width:100%;font-size:13px;border-collapse:collapse">${rows.map(([l,v])=>`<tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0;color:var(--g400);width:40%;font-size:12px">${l}</td><td style="padding:6px 0;font-weight:500;color:${v==='—'?'var(--g400)':'var(--g800)'}">${v}</td></tr>`).join('')}</table></div>
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:12px;background:var(--g50);border-radius:8px"><input type="checkbox" id="aceite" style="width:auto;margin-top:2px;flex-shrink:0"><label for="aceite" style="font-size:13px;color:var(--g600);font-weight:400;text-transform:none;letter-spacing:0;cursor:pointer">Declaro que as informações são verdadeiras e que li e assinei o <strong>Termo FOR-10-001</strong>.</label></div>`;
+  document.getElementById('btnNext').innerHTML='Enviar solicitação';
+  document.getElementById('btnNext').onclick=enviarCadastro;
+}
+
+async function enviarCadastro(){
+  if(!document.getElementById('aceite').checked){alert('Aceite os termos para continuar.');return;}
+  const btn=document.getElementById('btnNext');btn.disabled=true;btn.innerHTML='<span class="spin"></span> Enviando...';
+  _protocolo='SOL-'+Math.floor(100000+Math.random()*900000);
+  _id=Date.now();
+  const reg={id:_id,protocolo:_protocolo,...formData,sigData,cnhFrenteData,cnhVersoData,cnhFrenteName:cnhFrenteFile?.name||'',cnhVersoName:cnhVersoFile?.name||'',status:'pendente',observacao:'',criadoEm:new Date().toISOString()};
+  const lista = await DB.getArr('motoristas_solic');
+  lista.push(reg);
+  await DB.set('motoristas_solic', lista);
+  await enviarEmail(reg);
+  document.getElementById('protocoloNum').textContent=_protocolo;
+  showPage('protocolo');
+  btn.disabled=false;btn.innerHTML='Enviar solicitação';
+}
+function prevStep(){if(step>1){step--;renderStep();}else showPage('home');}
+
+// ══ WHATSAPP ══
+function enviarWhatsApp(){
+  const sol=DB.getArr('motoristas_solic').find(s=>s.protocolo===_protocolo);
+  if(!sol){alert('Dados não encontrados.');return;}
+  const wppAdmin=getCfg('wpp');
+  const msg=encodeURIComponent(`*Novo cadastro CENA* 🚗\n\n*Protocolo:* ${sol.protocolo}\n*Nome:* ${sol.nome}\n*CPF:* ${sol.cpf}\n*Matrícula:* ${sol.matricula}\n*CNH:* ${sol.cnh} (Cat. ${sol.categoria}) — ${sol.cnhstatus}\n*Cargo:* ${sol.cargo}\n*Gestor:* ${sol.gestor}\n*Enviado em:* ${new Date(sol.criadoEm).toLocaleString('pt-BR')}\n\nAcesse o painel para aprovar ou rejeitar.`);
+  const num=wppAdmin||'';
+  const url=num?`https://wa.me/${num}?text=${msg}`:`https://wa.me/?text=${msg}`;
+  window.open(url,'_blank');
+}
+
+// ══ PDF ══
+function gerarPDFProtocolo(){
+  const sol=DB.getArr('motoristas_solic').find(s=>s.protocolo===_protocolo);
+  if(!sol){alert('Dados não encontrados.');return;}
+  gerarPDF(sol);
+}
+function gerarPDFById(id){
+  const sol=DB.getArr('motoristas_solic').find(s=>s.id===id);
+  if(!sol){alert('Não encontrado.');return;}
+  gerarPDF(sol);
+}
+function gerarPDF(sol){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const pw=doc.internal.pageSize.getWidth();
+  const hoje=new Date(sol.criadoEm||Date.now()).toLocaleDateString('pt-BR');
+
+  // Header
+  doc.setFillColor(26,46,74);doc.rect(0,0,pw,28,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(14);doc.setFont('helvetica','bold');
+  doc.text('FOR-10-001 — TERMO DE RESPONSABILIDADE POR USO DE VEÍCULO',pw/2,12,{align:'center'});
+  doc.setFontSize(9);doc.setFont('helvetica','normal');
+  doc.text('CENA — LAND SOLUÇÕES LTDA. · CNPJ 28.390.966/0001-00',pw/2,20,{align:'center'});
+  doc.text(`Rev. 0 · 13/06/2024 · Protocolo: ${sol.protocolo}`,pw/2,25,{align:'center'});
+
+  doc.setTextColor(30,35,48);let y=36;
+  // Dados
+  doc.setFillColor(248,249,250);doc.roundedRect(14,y-4,pw-28,32,2,2,'F');
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(90,96,112);
+  doc.text('DADOS DO MOTORISTA',16,y+1);y+=6;
+  doc.setFont('helvetica','normal');doc.setTextColor(30,35,48);doc.setFontSize(10);
+  const dadosL=[['Nome',sol.nome],['CPF',sol.cpf],['Matrícula',sol.matricula],['Cargo',sol.cargo]];
+  const dadosR=[['Telefone',sol.telefone||'—'],['Gestor',sol.gestor],['C. Custo',sol.centrocusto],['Data',hoje]];
+  dadosL.forEach(([l,v],i)=>{doc.setFont('helvetica','bold');doc.text(l+':',16,y+i*5.5);doc.setFont('helvetica','normal');doc.text(v||'—',38,y+i*5.5);});
+  dadosR.forEach(([l,v],i)=>{doc.setFont('helvetica','bold');doc.text(l+':',pw/2+2,y+i*5.5);doc.setFont('helvetica','normal');doc.text(v||'—',pw/2+18,y+i*5.5);});
+  y+=26;
+
+  // CNH
+  doc.setFillColor(235,244,255);doc.roundedRect(14,y-4,pw-28,22,2,2,'F');
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(90,96,112);doc.text('CNH',16,y+1);y+=6;
+  doc.setFont('helvetica','normal');doc.setTextColor(30,35,48);doc.setFontSize(10);
+  doc.text(`Número: ${sol.cnh}   Categoria: ${sol.categoria}   Validade: ${sol.cnhval||'—'}   Status: ${sol.cnhstatus}`,16,y);y+=14;
+
+  // Termo
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(90,96,112);doc.text('TERMO DE RESPONSABILIDADE',16,y);y+=5;
+  doc.setFont('helvetica','normal');doc.setTextColor(30,35,48);doc.setFontSize(9.5);
+  const termoTxt=`Pelo presente termo, eu, ${sol.nome}, CPF ${sol.cpf}, na qualidade de ${sol.cargo} da LAND SOLUÇÕES LTDA. (CENA), Rua Coaquira, 110 – Vila Anastácio – São Paulo – SP, CNPJ 28.390.966/0001-00, responsabilizo-me civil e criminalmente por qualquer ação ou omissão ao conduzir veículo da CENA, obrigando-me a: 1) Respeitar normas de trânsito; 2) Dirigir com cautela; 3) Ser diligente com o veículo; 4) Pagar multas em 24h; 5) Pagar avarias imediatamente; 6) Retirar e devolver o veículo diariamente; 7) Guardar em local seguro; 8) Informar danos imediatamente; 9) Verificar condição ao receber; 10) Jamais ceder as chaves; 11) Não usar para fins pessoais; 12) Não transportar sem autorização; 13) Não modificar sem autorização escrita; 14) Não suprimir peças; 15) Cumprir IT-10-001.\n\nO descumprimento sujeita-me à rescisão por justa causa (art. 482 CLT).\n\nSão Paulo, ${hoje}`;
+  const linhas=doc.splitTextToSize(termoTxt,pw-30);
+  doc.text(linhas,16,y);y+=linhas.length*4.5+8;
+
+  // Assinatura
+  if(sol.sigData&&y<240){
+    doc.setDrawColor(200,200,200);doc.line(16,y,16+60,y);
+    try{doc.addImage(sol.sigData,'PNG',16,y-18,60,16);}catch(e){}
+    doc.setFontSize(9);doc.text(sol.nome,16,y+4);doc.text(`Mat: ${sol.matricula}`,16,y+8);
+  }
+
+  // Footer
+  const ph=doc.internal.pageSize.getHeight();
+  doc.setFillColor(26,46,74);doc.rect(0,ph-12,pw,12,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(8);
+  doc.text('CENA – LAND SOLUÇÕES LTDA. · CNPJ 28.390.966/0001-00 · Rua Coaquira, 110 – Vila Anastácio – São Paulo – SP',pw/2,ph-4,{align:'center'});
+
+  doc.save(`CENA_Termo_${sol.protocolo}_${sol.nome.replace(/ /g,'_')}.pdf`);
+}
+
+// ══ ÁREA DO MOTORISTA ══
+function loginMotorista(){
+  const cpf=document.getElementById('motCPF').value.trim();
+  const prot=document.getElementById('motProt').value.trim().toUpperCase();
+  const err=document.getElementById('motErr');
+  const lista=DB.getArr('motoristas_solic');
+  const sol=lista.find(s=>s.cpf===cpf&&s.protocolo===prot);
+  if(!sol){err.textContent='CPF ou protocolo incorretos.';err.style.display='block';return;}
+  err.style.display='none';
+  renderMotoristaPanel(sol);
+  showPage('motorista-painel');
+}
+function renderMotoristaPanel(sol){
+  const bMap={pendente:'badge-p',aprovado:'badge-a',rejeitado:'badge-r'};
+  const lMap={pendente:'⏳ Aguardando análise',aprovado:'✅ Aprovado',rejeitado:'❌ Não aprovado'};
+  document.getElementById('motPainelContent').innerHTML=`
+    <div class="card" style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div><p style="font-size:17px;font-weight:700">${sol.nome}</p><p style="font-size:12px;color:var(--g400);font-family:'DM Mono',monospace;margin-top:2px">${sol.protocolo}</p></div>
+        <span class="badge ${bMap[sol.status]}">${lMap[sol.status]}</span>
+      </div>
+      ${sol.observacao?`<div style="background:var(--amber-lt);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--amber);margin-bottom:12px">📝 ${sol.observacao}</div>`:''}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        ${[['CPF',sol.cpf],['Matrícula',sol.matricula],['Cargo',sol.cargo],['CNH',sol.cnh+' ('+sol.categoria+')'],['Gestor',sol.gestor],['Enviado',new Date(sol.criadoEm).toLocaleDateString('pt-BR')]].map(([l,v])=>`<div><p style="font-size:11px;color:var(--g400);font-weight:600">${l}</p><p style="font-size:13px;font-weight:500;margin-top:1px">${v}</p></div>`).join('')}
+      </div>
+      <button class="btn btn-sm btn-primary" onclick="gerarPDFById(${sol.id})">📄 Baixar Termo PDF</button>
+    </div>
+    ${sol.sigData?`<div class="card"><p style="font-size:11px;font-weight:600;color:var(--g400);text-transform:uppercase;margin-bottom:8px">Sua assinatura</p><img src="${sol.sigData}" style="max-height:60px;border:1px solid var(--border);border-radius:6px;background:#fff;padding:3px"></div>`:''}`;
+}
+
+// ══ CONSULTA ══
+function consultarProtocolo(){
+  const num=document.getElementById('consultInput').value.trim().toUpperCase();
+  const div=document.getElementById('consultResult');
+  const sol=DB.getArr('motoristas_solic').find(s=>s.protocolo===num);
+  if(!sol){div.innerHTML=`<div style="background:var(--red-lt);border-radius:8px;padding:12px;font-size:13px;color:var(--red)">Protocolo não encontrado.</div>`;return;}
+  const bMap={pendente:'badge-p',aprovado:'badge-a',rejeitado:'badge-r'};
+  const lMap={pendente:'Aguardando análise',aprovado:'Aprovado',rejeitado:'Não aprovado'};
+  div.innerHTML=`<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><p style="font-weight:600;font-size:15px">${sol.nome}</p><p style="font-size:12px;color:var(--g400);font-family:'DM Mono',monospace">${sol.protocolo}</p></div><span class="badge ${bMap[sol.status]}">${lMap[sol.status]}</span></div><p style="font-size:12px;color:var(--g400)">Enviado em ${new Date(sol.criadoEm).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}</p>${sol.observacao?`<p style="font-size:13px;background:var(--amber-lt);padding:8px 10px;border-radius:6px;margin-top:8px;color:var(--amber)">${sol.observacao}</p>`:''}</div>`;
+}
+
+// ══ ADMIN AUTH ══
+async function fazerLogin(){
+  const e=document.getElementById('adminEmail').value.trim(),s=document.getElementById('adminSenha').value,err=document.getElementById('loginErr');
+  if(e===getCfg('adminEmail')&&s===getCfg('adminSenha')){isLoggedIn=true;err.style.display='none';showPage('admin');}
+  else{err.textContent='E-mail ou senha inválidos.';err.style.display='block';}
+}
+function fazerLogout(){isLoggedIn=false;showPage('home');}
+
+// ══ ADMIN DASHBOARD ══
+let adminTab='pendente';
+function setTab(t){adminTab=t;['pendente','aprovado','rejeitado','todos'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('active',x===t));renderAdmin();}
+function renderAdmin(){
+  const lista=DB.getArr('motoristas_solic');
+  const busca=(document.getElementById('adminBusca')?.value||'').toLowerCase();
+  const filtered=lista.filter(s=>{const mt=adminTab==='todos'||s.status===adminTab;const mb=!busca||[s.nome,s.matricula,s.cnh,s.protocolo,s.cpf||''].join(' ').toLowerCase().includes(busca);return mt&&mb;});
+  document.getElementById('statsGrid').innerHTML=[{label:'Total',val:lista.length,color:'var(--navy)'},{label:'Pendentes',val:lista.filter(s=>s.status==='pendente').length,color:'var(--amber)'},{label:'Aprovados',val:lista.filter(s=>s.status==='aprovado').length,color:'var(--green)'},{label:'Hoje',val:lista.filter(s=>new Date(s.criadoEm).toDateString()===new Date().toDateString()).length,color:'var(--blue)'}].map(s=>`<div class="stat-card"><div class="stat-label">${s.label}</div><div class="stat-val" style="color:${s.color}">${s.val}</div></div>`).join('');
+  document.getElementById('adminGreet').textContent='Olá, '+getCfg('adminEmail');
+  const bMap={pendente:'badge-p',aprovado:'badge-a',rejeitado:'badge-r'};
+  const lMap={pendente:'Aguardando',aprovado:'Aprovado',rejeitado:'Rejeitado'};
+  if(!filtered.length){document.getElementById('adminTable').innerHTML=`<tr><td colspan="9" style="padding:36px;text-align:center;color:var(--g400)">Nenhuma solicitação.</td></tr>`;return;}
+  document.getElementById('adminTable').innerHTML=`<thead><tr><th>Protocolo</th><th>Nome</th><th>CPF</th><th>Matrícula</th><th>CNH</th><th>Gestor</th><th>Data</th><th>Status</th><th></th></tr></thead><tbody>`+
+  filtered.slice().reverse().map(s=>`<tr><td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--blue);font-weight:500">${s.protocolo}</td><td style="font-weight:500">${s.nome}</td><td style="color:var(--g600);font-size:12px">${s.cpf||'—'}</td><td style="color:var(--g600)">${s.matricula}</td><td style="color:var(--g600)">${s.cnh}</td><td style="color:var(--g600)">${s.gestor}</td><td style="color:var(--g400);white-space:nowrap">${new Date(s.criadoEm).toLocaleDateString('pt-BR')}</td><td><span class="badge ${bMap[s.status]}">${lMap[s.status]}</span></td><td><button class="btn btn-sm" onclick="verDetalhe(${s.id})">Ver →</button></td></tr>`).join('')+'</tbody>';
+}
+
+// ══ DASHBOARD ANALÍTICO ══
+function renderDashboard(){
+  const lista=DB.getArr('motoristas_solic');
+  if(!lista.length){document.getElementById('dashContent').innerHTML=`<div class="card" style="text-align:center;padding:40px;color:var(--g400)">Nenhum dado disponível ainda.</div>`;return;}
+  const total=lista.length;
+  const pend=lista.filter(s=>s.status==='pendente').length;
+  const aprov=lista.filter(s=>s.status==='aprovado').length;
+  const rej=lista.filter(s=>s.status==='rejeitado').length;
+  const txAprov=total>0?Math.round((aprov/total)*100):0;
+  // por categoria
+  const cats={};lista.forEach(s=>{if(s.categoria)cats[s.categoria]=(cats[s.categoria]||0)+1;});
+  const catSorted=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+  const maxCat=catSorted[0]?catSorted[0][1]:1;
+  // por mês (últimos 6)
+  const meses={};lista.forEach(s=>{const d=new Date(s.criadoEm);const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;meses[k]=(meses[k]||0)+1;});
+  const mesesArr=Object.entries(meses).sort().slice(-6);
+  const maxMes=mesesArr.length?Math.max(...mesesArr.map(m=>m[1])):1;
+  // por gestor
+  const gestores={};lista.forEach(s=>{if(s.gestor)gestores[s.gestor]=(gestores[s.gestor]||0)+1;});
+  const gestSorted=Object.entries(gestores).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const maxGest=gestSorted[0]?gestSorted[0][1]:1;
+
+  document.getElementById('dashContent').innerHTML=`
+    <div class="g4" style="margin-bottom:18px">
+      <div class="stat-card"><div class="stat-label">Total cadastros</div><div class="stat-val" style="color:var(--navy)">${total}</div></div>
+      <div class="stat-card"><div class="stat-label">Taxa de aprovação</div><div class="stat-val" style="color:var(--green)">${txAprov}%</div></div>
+      <div class="stat-card"><div class="stat-label">Pendentes</div><div class="stat-val" style="color:var(--amber)">${pend}</div><div style="font-size:11px;color:var(--g400);margin-top:3px">${total>0?Math.round((pend/total)*100):0}% do total</div></div>
+      <div class="stat-card"><div class="stat-label">Rejeitados</div><div class="stat-val" style="color:var(--red)">${rej}</div><div style="font-size:11px;color:var(--g400);margin-top:3px">${total>0?Math.round((rej/total)*100):0}% do total</div></div>
+    </div>
+    <div class="g2" style="margin-bottom:18px">
+      <div class="card">
+        <p style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:16px">Status geral</p>
+        <div style="display:flex;align-items:center;gap:18px">
+          <div class="donut-wrap">
+            <svg width="110" height="110" viewBox="0 0 110 110">
+              ${donutSegments([{v:aprov,c:'#1a6e3a'},{v:pend,c:'#7a4a00'},{v:rej,c:'#8B1A1A'}],total,55,40)}
+            </svg>
+            <div class="donut-label"><div style="font-size:20px;font-weight:700">${total}</div><div style="font-size:10px;color:var(--g400)">total</div></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+            ${[['Aprovados',aprov,'var(--green)'],['Pendentes',pend,'var(--amber)'],['Rejeitados',rej,'var(--red)']].map(([l,v,c])=>`<div style="display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;border-radius:50%;background:${c};flex-shrink:0"></div><span style="font-size:13px;flex:1">${l}</span><span style="font-weight:700;font-size:14px;color:${c}">${v}</span></div>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <p style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:14px">Cadastros por mês</p>
+        <div class="chart-bar-wrap">
+          ${mesesArr.map(([k,v])=>{const [ano,mes]=k.split('-');const nomeMes=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(mes)-1];return `<div class="chart-bar-row"><div class="chart-bar-label">${nomeMes}/${ano.slice(2)}</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:${Math.round((v/maxMes)*100)}%;background:var(--blue)"></div></div><div class="chart-bar-val">${v}</div></div>`;}).join('')||'<p style="color:var(--g400);font-size:13px">Sem dados</p>'}
+        </div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <p style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:14px">Categorias de CNH</p>
+        <div class="chart-bar-wrap">
+          ${catSorted.map(([k,v])=>`<div class="chart-bar-row"><div class="chart-bar-label">${k}</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:${Math.round((v/maxCat)*100)}%;background:var(--purple)"></div></div><div class="chart-bar-val">${v}</div></div>`).join('')||'<p style="color:var(--g400);font-size:13px">Sem dados</p>'}
+        </div>
+      </div>
+      <div class="card">
+        <p style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:14px">Top gestores</p>
+        <div class="chart-bar-wrap">
+          ${gestSorted.map(([k,v])=>`<div class="chart-bar-row"><div class="chart-bar-label" title="${k}">${k}</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:${Math.round((v/maxGest)*100)}%;background:var(--green)"></div></div><div class="chart-bar-val">${v}</div></div>`).join('')||'<p style="color:var(--g400);font-size:13px">Sem dados</p>'}
+        </div>
+      </div>
+    </div>`;
+}
+function donutSegments(segs,total,cx,r){
+  if(total===0) return `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="var(--g200)" stroke-width="18"/>`;
+  let offset=0;const circ=2*Math.PI*r;let html='';
+  segs.forEach(({v,c})=>{if(!v)return;const pct=v/total;const dash=circ*pct;html+=`<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${c}" stroke-width="18" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cx})"/>`;offset+=dash;});
+  return html;
+}
+
+// ══ PLANILHA ══
+let planilhaTab='todos';
+function setPTab(t){planilhaTab=t;['todos','pendente','aprovado','rejeitado'].forEach(x=>document.getElementById('ptab-'+x).classList.toggle('active',x===t));renderPlanilha();}
+function renderPlanilha(){
+  const lista=DB.getArr('motoristas_solic');
+  const busca=(document.getElementById('planilhaBusca')?.value||'').toLowerCase();
+  const bMap={pendente:'badge-p',aprovado:'badge-a',rejeitado:'badge-r'};
+  const lMap={pendente:'Aguardando',aprovado:'Aprovado',rejeitado:'Rejeitado'};
+  const filtered=lista.filter(s=>{const mt=planilhaTab==='todos'||s.status===planilhaTab;const mb=!busca||[s.nome,s.matricula,s.cnh,s.protocolo,s.cpf||'',s.cargo,s.gestor].join(' ').toLowerCase().includes(busca);return mt&&mb;}).slice().reverse();
+  const t=document.getElementById('planilhaTable');
+  if(!filtered.length){t.innerHTML=`<tr><td colspan="13" style="padding:32px;text-align:center;color:var(--g400)">Nenhum registro.</td></tr>`;return;}
+  t.innerHTML=`<thead><tr><th>#</th><th>Protocolo</th><th>Nome</th><th>CPF</th><th>Matrícula</th><th>Cargo</th><th>Telefone</th><th>CNH</th><th>Cat.</th><th>Validade</th><th>Gestor</th><th>Data</th><th>Status</th><th>Docs</th></tr></thead><tbody>`+
+  filtered.map((s,i)=>`<tr style="background:${i%2===0?'#fff':'var(--g50)'}">
+    <td style="color:var(--g400);font-size:12px">${filtered.length-i}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue);white-space:nowrap">${s.protocolo}</td>
+    <td style="font-weight:500;white-space:nowrap">${s.nome}</td>
+    <td style="font-size:12px">${s.cpf||'—'}</td>
+    <td style="font-size:12px">${s.matricula}</td>
+    <td style="font-size:12px;white-space:nowrap">${s.cargo}</td>
+    <td style="font-size:12px">${s.telefone||'—'}</td>
+    <td style="font-size:12px">${s.cnh}</td>
+    <td style="font-size:12px">${s.categoria}</td>
+    <td style="font-size:12px;white-space:nowrap">${s.cnhval||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap">${s.gestor}</td>
+    <td style="font-size:12px;white-space:nowrap;color:var(--g400)">${new Date(s.criadoEm).toLocaleDateString('pt-BR')}</td>
+    <td><span class="badge ${bMap[s.status]}">${lMap[s.status]}</span></td>
+    <td style="white-space:nowrap">
+      ${s.cnhFrenteData?`<button class="img-preview-btn" onclick="previewImagem(${s.id},'frente')">🪪 F</button> `:''}
+      ${s.cnhVersoData?`<button class="img-preview-btn" onclick="previewImagem(${s.id},'verso')">🪪 V</button> `:''}
+      ${s.sigData?`<button class="img-preview-btn" onclick="previewTermoPorId(${s.id})" style="background:#f0f8f0;color:var(--green)">📄</button> `:''}
+      <button class="img-preview-btn" onclick="gerarPDFById(${s.id})" style="background:#fff8e1;color:var(--amber)">⬇ PDF</button>
+    </td>
+  </tr>`).join('')+'</tbody>';
+}
+function exportarCSV(){
+  const lista=DB.getArr('motoristas_solic');if(!lista.length){alert('Nenhum dado.');return;}
+  const cols=['protocolo','nome','cpf','matricula','cargo','telefone','centrocusto','gestor','cnh','categoria','cnhval','cnhstatus','status','observacao','criadoEm'];
+  const csv='\uFEFF'+[cols.join(';'),...lista.map(s=>cols.map(c=>`"${(s[c]||'').toString().replace(/"/g,'""')}"`).join(';'))].join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download='motoristas_cena.csv';a.click();
+}
+
+// ══ DETALHE ══
+let acaoSelecionada='';
+function verDetalhe(id){
+  const sol=DB.getArr('motoristas_solic').find(s=>s.id===id);if(!sol)return;
+  const bMap={pendente:'badge-p',aprovado:'badge-a',rejeitado:'badge-r'};
+  const lMap={pendente:'Aguardando análise',aprovado:'Aprovado',rejeitado:'Rejeitado'};
+  acaoSelecionada='';
+  document.getElementById('detalheContent').innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+      <span style="color:var(--g400);cursor:pointer;font-size:13px" onclick="showPage('admin')">← Voltar</span>
+      <span style="color:var(--border)">|</span>
+      <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--blue);font-weight:600">${sol.protocolo}</span>
+      <span class="badge ${bMap[sol.status]}">${lMap[sol.status]}</span>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <button class="btn btn-sm btn-wpp" onclick="enviarWppDetalhe(${id})">💬 WhatsApp</button>
+        <button class="btn btn-sm btn-primary" onclick="gerarPDFById(${id})">📄 PDF</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card">
+          <p style="font-size:11px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Dados pessoais</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            ${[['Nome',sol.nome],['CPF',sol.cpf],['Matrícula',sol.matricula],['Telefone',sol.telefone],['Cargo',sol.cargo],['C. Custo',sol.centrocusto],['Gestor',sol.gestor]].map(([l,v])=>`<div><p style="font-size:11px;color:var(--g400);font-weight:500">${l}</p><p style="font-size:13px;font-weight:500;margin-top:1px">${v||'—'}</p></div>`).join('')}
+          </div>
+        </div>
+        <div class="card">
+          <p style="font-size:11px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">CNH</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+            ${[['Número',sol.cnh],['Validade',sol.cnhval||'—'],['Categoria',sol.categoria],['Status',sol.cnhstatus]].map(([l,v])=>`<div><p style="font-size:11px;color:var(--g400);font-weight:500">${l}</p><p style="font-size:13px;font-weight:500;margin-top:1px">${v||'—'}</p></div>`).join('')}
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            ${sol.cnhFrenteData?`<button class="img-preview-btn" onclick="previewImagem(${sol.id},'frente')">🪪 Ver frente</button>`:'<span style="font-size:12px;color:var(--g400)">Frente não enviada</span>'}
+            ${sol.cnhVersoData?`<button class="img-preview-btn" onclick="previewImagem(${sol.id},'verso')">🪪 Ver verso</button>`:'<span style="font-size:12px;color:var(--g400)">Verso não enviada</span>'}
+          </div>
+        </div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <p style="font-size:11px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.05em">Termo FOR-10-001</p>
+            ${sol.sigData?`<button class="img-preview-btn" onclick="previewTermoPorId(${sol.id})" style="background:#f0f8f0;color:var(--green)">📄 Ver documento</button>`:''}
+          </div>
+          ${sol.sigData?`<img src="${sol.sigData}" style="max-height:70px;border:1px solid var(--border);border-radius:8px;background:#fff;padding:4px">`:'<p style="font-size:12px;color:var(--g400)">—</p>'}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card"><p style="font-size:11px;font-weight:700;color:var(--g400);text-transform:uppercase;margin-bottom:8px">Recebido em</p><p style="font-size:13px;font-weight:500">${new Date(sol.criadoEm).toLocaleString('pt-BR')}</p></div>
+        ${sol.status==='pendente'?`
+        <div class="card">
+          <p style="font-size:11px;font-weight:700;color:var(--g400);text-transform:uppercase;margin-bottom:12px">Ação</p>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <button id="btnAprovar" onclick="selecionarAcao('aprovado',${id})" style="flex:1;padding:9px;border-radius:8px;border:2px solid var(--border);background:#fff;color:var(--g600);cursor:pointer;font-size:13px;font-weight:600;font-family:inherit">✓ Aprovar</button>
+            <button id="btnRejeitar" onclick="selecionarAcao('rejeitado',${id})" style="flex:1;padding:9px;border-radius:8px;border:2px solid var(--border);background:#fff;color:var(--g600);cursor:pointer;font-size:13px;font-weight:600;font-family:inherit">✗ Rejeitar</button>
+          </div>
+          <div class="field"><label>Observação</label><textarea id="acaoObs" rows="3" placeholder="Motivo..." style="resize:vertical"></textarea></div>
+          <button class="btn btn-primary" style="width:100%;opacity:.5" id="btnConfAcao" disabled onclick="confirmarAcao(${id})">Selecione uma ação</button>
+        </div>`:`
+        <div class="card">
+          <p style="font-size:11px;font-weight:700;color:var(--g400);text-transform:uppercase;margin-bottom:8px">Status final</p>
+          <span class="badge ${bMap[sol.status]}">${lMap[sol.status]}</span>
+          ${sol.observacao?`<p style="font-size:13px;color:var(--g600);margin-top:10px">${sol.observacao}</p>`:''}
+        </div>`}
+      </div>
+    </div>`;
+  showPage('adminDetalhe');
+}
+function enviarWppDetalhe(id){
+  const sol=DB.getArr('motoristas_solic').find(s=>s.id===id);if(!sol)return;
+  const wppAdmin=getCfg('wpp');
+  const msg=encodeURIComponent(`*Cadastro CENA* 🚗\n\n*Protocolo:* ${sol.protocolo}\n*Nome:* ${sol.nome}\n*CPF:* ${sol.cpf}\n*CNH:* ${sol.cnh} (${sol.categoria}) — ${sol.cnhstatus}\n*Status:* ${sol.status.toUpperCase()}\n${sol.observacao?'*Obs:* '+sol.observacao:''}`);
+  window.open(`https://wa.me/${wppAdmin||''}?text=${msg}`,'_blank');
+}
+function selecionarAcao(tipo,id){
+  acaoSelecionada=tipo;
+  const ba=document.getElementById('btnAprovar'),br=document.getElementById('btnRejeitar');
+  ba.style.borderColor=tipo==='aprovado'?'var(--green)':'var(--border)';ba.style.background=tipo==='aprovado'?'var(--green-lt)':'#fff';ba.style.color=tipo==='aprovado'?'var(--green)':'var(--g600)';
+  br.style.borderColor=tipo==='rejeitado'?'var(--red)':'var(--border)';br.style.background=tipo==='rejeitado'?'var(--red-lt)':'#fff';br.style.color=tipo==='rejeitado'?'var(--red)':'var(--g600)';
+  const btn=document.getElementById('btnConfAcao');btn.disabled=false;btn.style.opacity='1';
+  btn.className='btn '+(tipo==='aprovado'?'btn-success':'btn-danger');btn.style.width='100%';
+  btn.textContent='Confirmar — '+(tipo==='aprovado'?'Aprovar':'Rejeitar');
+}
+function confirmarAcao(id){
+  if(!acaoSelecionada)return;
+  const obs=document.getElementById('acaoObs').value.trim();
+  if(acaoSelecionada==='rejeitado'&&!obs){alert('Informe o motivo da rejeição.');return;}
+  const lista=DB.getArr('motoristas_solic');const idx=lista.findIndex(s=>s.id===id);if(idx===-1)return;
+  lista[idx].status=acaoSelecionada;lista[idx].observacao=obs;DB.set('motoristas_solic',lista);
+  alert('Solicitação '+(acaoSelecionada==='aprovado'?'aprovada':'rejeitada')+'!');
+  acaoSelecionada='';showPage('admin');
+}
+
+// ══ CONFIG ══
+function loadConfig(){
+  document.getElementById('cfgEmail').value=getCfg('adminEmail');
+  document.getElementById('cfgSenha').value='';
+  document.getElementById('cfgWpp').value=getCfg('wpp');
+  document.getElementById('cfgEjsService').value=getCfg('ejsService');
+  document.getElementById('cfgEjsTemplate').value=getCfg('ejsTemplate');
+  document.getElementById('cfgEjsKey').value=getCfg('ejsKey');
+  document.getElementById('cfgEmailDest').value=getCfg('emailDest');
+}
+function salvarConfig(){
+  const ne=document.getElementById('cfgEmail').value.trim(),ns=document.getElementById('cfgSenha').value,sa=document.getElementById('cfgSenhaAtual').value,msg=document.getElementById('cfgMsg');
+  if(ns){if(sa!==getCfg('adminSenha')){msg.textContent='Senha atual incorreta.';msg.style.color='var(--red)';return;}if(ns.length<6){msg.textContent='Senha muito curta.';msg.style.color='var(--red)';return;}setCfg('adminSenha',ns);}
+  if(ne)setCfg('adminEmail',ne);
+  setCfg('wpp',document.getElementById('cfgWpp').value.trim());
+  setCfg('ejsService',document.getElementById('cfgEjsService').value.trim());
+  setCfg('ejsTemplate',document.getElementById('cfgEjsTemplate').value.trim());
+  setCfg('ejsKey',document.getElementById('cfgEjsKey').value.trim());
+  setCfg('emailDest',document.getElementById('cfgEmailDest').value.trim());
+  msg.textContent='✓ Salvo!';msg.style.color='var(--green)';setTimeout(()=>msg.textContent='',3000);
+}
+
+// ══ EMAIL ══
+async function enviarEmail(sol){
+  const svcId=getCfg('ejsService'),tplId=getCfg('ejsTemplate'),pubKey=getCfg('ejsKey'),dest=getCfg('emailDest')||'juliana.mokarzel@cenabr.com.br';
+  if(!svcId||!tplId||!pubKey)return;
+  try{emailjs.init(pubKey);await emailjs.send(svcId,tplId,{to_email:dest,protocolo:sol.protocolo,nome:sol.nome,cpf:sol.cpf||'',matricula:sol.matricula,cargo:sol.cargo,gestor:sol.gestor,cnh:sol.cnh,categoria:sol.categoria,data_envio:new Date().toLocaleString('pt-BR'),message:`Nova solicitação: ${sol.protocolo} — ${sol.nome}`});}
+  catch(e){console.error('EmailJS:',e);}
+}
+</script>
+</body>
+</html>
